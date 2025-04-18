@@ -57,11 +57,11 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       } as React.CSSProperties}
       onClick={handleClick}
     >
-      <img 
-        src={item.icon} 
-        alt={item.name}
-        className="w-16 h-16 object-contain"
-      />
+      <div 
+        className="w-16 h-16 flex items-center justify-center text-4xl"
+      >
+        {item.icon}
+      </div>
     </div>
   );
 };

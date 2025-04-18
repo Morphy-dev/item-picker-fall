@@ -1,6 +1,16 @@
 
 import { Item } from '@/types/game';
 
+// Define weather items with emoji icons
+export const weatherItems = [
+  { name: 'Sunny', icon: '☀️' },
+  { name: 'Rainy', icon: '🌧️' },
+  { name: 'Cloudy', icon: '☁️' },
+  { name: 'Snowy', icon: '❄️' },
+  { name: 'Stormy', icon: '⚡' },
+  { name: 'Windy', icon: '💨' }
+];
+
 export type GameAction =
   | { type: 'START_GAME' }
   | { type: 'RESET_GAME' }
