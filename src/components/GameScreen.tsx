@@ -1,6 +1,5 @@
-
 import React, { useEffect } from 'react';
-import { useGame } from '@/contexts/GameContext';
+import { useGame } from '@/contexts/game/GameContext';
 import FallingItem from './FallingItem';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -18,12 +17,10 @@ const GameScreen: React.FC = () => {
     isGameStarted 
   } = state;
 
-  // Force reflow on game reset to restart animations
   useEffect(() => {
     if (!isGameStarted && activeItems.length === 0) {
       const gameContainer = document.getElementById('game-container');
       if (gameContainer) {
-        // Force reflow
         void gameContainer.offsetWidth;
       }
     }
@@ -31,7 +28,6 @@ const GameScreen: React.FC = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-game-bg-start to-game-bg-end">
-      {/* Game HUD */}
       <div className="absolute top-0 left-0 right-0 z-10 p-4 bg-black/30 backdrop-blur-sm text-white">
         <div className="container max-w-5xl mx-auto">
           <div className="flex justify-between items-center">
@@ -52,7 +48,6 @@ const GameScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Game Area */}
       <div 
         id="game-container"
         className="relative w-full h-full"
@@ -62,7 +57,6 @@ const GameScreen: React.FC = () => {
         ))}
       </div>
 
-      {/* Start/Game Over Overlay */}
       {(!isGameStarted || isGameOver) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm text-white animate-fade-in">
           <div className="animate-scale-up text-center p-6 bg-black/40 rounded-xl max-w-md">

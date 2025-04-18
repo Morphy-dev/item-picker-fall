@@ -1,8 +1,7 @@
-
 import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Item } from '@/types/game';
-import { useGame } from '@/contexts/GameContext';
+import { useGame } from '@/contexts/game/GameContext';
 
 interface FallingItemProps {
   item: Item;
