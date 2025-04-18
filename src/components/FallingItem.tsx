@@ -57,19 +57,21 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
     <div
       ref={itemRef}
       className={cn(
-        "absolute cursor-pointer transform transition-all duration-300",
-        "animate-fall hover:scale-110",
-        isSelected ? "absolute inset-0 flex items-center justify-center z-50" : "", 
-        isDisappearing ? "opacity-0" : "",
+        "absolute cursor-pointer transform transition-all",
+        !isSelected && "animate-fall hover:scale-110",
+        isSelected && "fixed inset-0 flex items-center justify-center z-50", 
+        isDisappearing && "opacity-0",
         "motion-reduce:transition-none motion-reduce:hover:transform-none"
       )}
       style={{
-        left: isSelected ? undefined : `${item.x}%`,
-        top: isSelected ? undefined : '-100px',
-        transform: isSelected ? 'scale(2)' : 'none',
+        left: isSelected ? '50%' : `${item.x}%`,
+        top: isSelected ? '50%' : '-100px',
+        transform: isSelected ? 'translate(-50%, -50%) scale(2)' : 'none',
         animationDuration: `${FALL_SPEED}s`,
-        transitionProperty: isSelected ? 'opacity, transform' : 'transform',
-        transitionDuration: isSelected ? '0.5s' : '0.3s'
+        animationPlayState: isSelected ? 'paused' : 'running',
+        transition: isSelected 
+          ? 'opacity 0.5s, transform 0.3s' 
+          : 'transform 0.3s'
       }}
       onClick={handleClick}
     >
