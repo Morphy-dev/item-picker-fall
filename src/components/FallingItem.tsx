@@ -14,10 +14,11 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
   const { playSequentialSounds } = useSoundEffects();
   const itemRef = useRef<HTMLDivElement>(null);
 
-  const handleClick = async () => {
+  const handleClick = () => {
     if (!item.collected && !item.missed) {
       pauseStream();
-      await playSequentialSounds(['select', item.type === 'good' ? 'correct' : 'wrong']);
+      // Remove await - let sounds play in background
+      playSequentialSounds(['select', item.type === 'good' ? 'correct' : 'wrong']);
       collectItem(item.id);
       resumeStream();
     }
