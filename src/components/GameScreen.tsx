@@ -4,6 +4,7 @@ import { useGame } from '@/contexts/game/GameContext';
 import FallingItem from './FallingItem';
 import { Button } from '@/components/ui/button';
 import { usePlayInstructions } from '@/hooks/usePlayInstructions';
+import { usePreloadResources } from '@/hooks/usePreloadResources';
 
 const GameScreen: React.FC = () => {
   const { state, startGame, resetGame } = useGame();
@@ -12,6 +13,7 @@ const GameScreen: React.FC = () => {
     isGameOver,
     isGameStarted,
   } = state;
+  const { isLoading } = usePreloadResources();
 
   usePlayInstructions(isGameStarted, state.items.length > 0);
 
@@ -23,6 +25,14 @@ const GameScreen: React.FC = () => {
       }
     }
   }, [isGameStarted, activeItems.length]);
+
+  if (isLoading) {
+    return (
+      <div className="relative w-full h-screen overflow-hidden bg-neutral-900 flex items-center justify-center">
+        <div className="text-white text-2xl animate-pulse">Loading resources...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-neutral-900">
@@ -52,4 +62,3 @@ const GameScreen: React.FC = () => {
 };
 
 export default GameScreen;
-
