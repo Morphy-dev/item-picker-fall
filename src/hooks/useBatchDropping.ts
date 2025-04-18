@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import { GameState } from '@/types/game';
 import { GameAction } from '@/contexts/game/gameActions';
@@ -8,8 +7,8 @@ export function useBatchDropping(state: GameState, dispatch: React.Dispatch<Game
   const doubleDropTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (!state.isGameStarted || state.isGameOver) {
-      // Clear timers when game is over or not started
+    if (!state.isGameStarted || state.isGameOver || state.isStreamPaused) {
+      // Clear timers when game is over, not started, or paused
       if (singleDropTimerRef.current) clearInterval(singleDropTimerRef.current);
       if (doubleDropTimerRef.current) clearInterval(doubleDropTimerRef.current);
       return;
@@ -33,5 +32,5 @@ export function useBatchDropping(state: GameState, dispatch: React.Dispatch<Game
       if (singleDropTimerRef.current) clearInterval(singleDropTimerRef.current);
       if (doubleDropTimerRef.current) clearInterval(doubleDropTimerRef.current);
     };
-  }, [state.isGameStarted, state.isGameOver, state.currentBatchIndex, state.batches.length, dispatch]);
+  }, [state.isGameStarted, state.isGameOver, state.isStreamPaused, state.currentBatchIndex, state.batches.length, dispatch]);
 }

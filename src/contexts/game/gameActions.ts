@@ -5,7 +5,9 @@ export type GameAction =
   | { type: 'GENERATE_ITEMS' }
   | { type: 'DROP_NEXT_ITEM' }
   | { type: 'DROP_TWO_ITEMS' }
-  | { type: 'RESET_GAME' };
+  | { type: 'RESET_GAME' }
+  | { type: 'PAUSE_STREAM' }
+  | { type: 'RESUME_STREAM' };
 
 // Icons for our items
 export const goodIcons = ['🍎', '🍓', '🍉', '🍊', '🥝', '🍇', '🍈', '🍌', '🍍', '🥭'];

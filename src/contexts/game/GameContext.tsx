@@ -13,6 +13,8 @@ const GameContext = createContext<{
   missItem: (id: string) => void;
   startGame: () => void;
   resetGame: () => void;
+  pauseStream: () => void;
+  resumeStream: () => void;
 } | undefined>(undefined);
 
 export function GameProvider({ children }: { children: ReactNode }) {
@@ -38,8 +40,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'RESET_GAME' });
   };
 
+  const pauseStream = () => {
+    dispatch({ type: 'PAUSE_STREAM' });
+  };
+
+  const resumeStream = () => {
+    dispatch({ type: 'RESUME_STREAM' });
+  };
+
   return (
-    <GameContext.Provider value={{ state, collectItem, missItem, startGame, resetGame }}>
+    <GameContext.Provider value={{ 
+      state, 
+      collectItem, 
+      missItem, 
+      startGame, 
+      resetGame,
+      pauseStream,
+      resumeStream
+    }}>
       {children}
     </GameContext.Provider>
   );

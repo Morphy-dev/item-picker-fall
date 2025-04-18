@@ -8,10 +8,15 @@ const SOUND_URLS = {
 } as const;
 
 export const useSoundEffects = () => {
-  const playSound = useCallback((type: keyof typeof SOUND_URLS) => {
-    const audio = new Audio(SOUND_URLS[type]);
-    audio.play().catch(console.error);
+  const playSequentialSounds = useCallback(async (sounds: Array<keyof typeof SOUND_URLS>) => {
+    for (const soundType of sounds) {
+      const audio = new Audio(SOUND_URLS[soundType]);
+      await audio.play();
+      await new Promise(resolve => {
+        audio.onended = resolve;
+      });
+    }
   }, []);
 
-  return { playSound };
+  return { playSequentialSounds };
 };

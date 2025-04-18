@@ -10,15 +10,16 @@ interface FallingItemProps {
 }
 
 const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
-  const { collectItem, missItem } = useGame();
-  const { playSound } = useSoundEffects();
+  const { collectItem, missItem, pauseStream, resumeStream } = useGame();
+  const { playSequentialSounds } = useSoundEffects();
   const itemRef = useRef<HTMLDivElement>(null);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (!item.collected && !item.missed) {
-      playSound('select');
+      pauseStream();
+      await playSequentialSounds(['select', item.type === 'good' ? 'correct' : 'wrong']);
       collectItem(item.id);
-      playSound(item.type === 'good' ? 'correct' : 'wrong');
+      resumeStream();
     }
   };
 

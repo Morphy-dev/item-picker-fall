@@ -14,6 +14,7 @@ export const initialState: GameState = {
   remainingItems: 50,
   isGameOver: false,
   isGameStarted: false,
+  isStreamPaused: false,
 };
 
 const FALL_SPEED = 8; // Constant fall speed in seconds
@@ -157,6 +158,18 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         items: [],
         activeItems: [],
         batches: [],
+      };
+
+    case 'PAUSE_STREAM':
+      return {
+        ...state,
+        isStreamPaused: true
+      };
+
+    case 'RESUME_STREAM':
+      return {
+        ...state,
+        isStreamPaused: false
       };
 
     default:
