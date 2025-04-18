@@ -11,9 +11,9 @@ export const initialState: GameState = {
   currentBatchIndex: 0,
   score: 0,
   goodItemsCollected: 0,
-  totalItems: 10,
-  goodItems: 3,
-  remainingItems: 10,
+  totalItems: 50, // Increased to allow more items in the stream
+  goodItems: 15, // Increased good items to maintain ratio
+  remainingItems: 50,
   isGameOver: false,
   isGameStarted: false,
   isStreamPaused: false,
@@ -45,6 +45,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         isGameStarted: true,
         attemptCount: 0,
+        goodItemsCollected: 0,
       };
     }
 
@@ -54,10 +55,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       const newAttemptCount = state.attemptCount + 1;
       const goodItemsCollected = item.type === 'good' ? state.goodItemsCollected + 1 : state.goodItemsCollected;
-      const remainingItems = state.remainingItems - 1;
       const isGameOver = newAttemptCount >= 10;
 
-      if (isGameOver) {
+      if (isGameOver && goodItemsCollected > 0) {
         supabase
           .from('another_weather_game')
           .update({ hits: goodItemsCollected })
@@ -74,7 +74,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ),
         score: item.type === 'good' ? state.score + 10 : state.score - 5,
         goodItemsCollected,
-        remainingItems,
         attemptCount: newAttemptCount,
         isGameOver,
       };
@@ -85,10 +84,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (!item || item.missed || item.collected) return state;
 
       const newAttemptCount = state.attemptCount + 1;
-      const remainingItems = state.remainingItems - 1;
       const isGameOver = newAttemptCount >= 10;
 
-      if (isGameOver) {
+      if (isGameOver && state.goodItemsCollected > 0) {
         supabase
           .from('another_weather_game')
           .update({ hits: state.goodItemsCollected })
@@ -103,7 +101,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         activeItems: state.activeItems.map((item) =>
           item.id === action.id ? { ...item, missed: true } : item
         ),
-        remainingItems,
         attemptCount: newAttemptCount,
         isGameOver,
       };
