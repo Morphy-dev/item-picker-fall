@@ -1,3 +1,4 @@
+
 import { GameState } from '@/types/game';
 import { GameAction } from './gameActions';
 import { createGameSession, updateSessionHits } from './sessionHandlers';
@@ -24,18 +25,26 @@ export const initialState: GameState = {
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case 'START_GAME': {
-      createGameSession().then(sessionId => {
-        if (sessionId) {
-          console.log('Created session:', sessionId);
-        }
-      });
-
-      return {
+      // Create a new session when starting the game and store the session ID
+      const newState = {
         ...state,
         isGameStarted: true,
         attemptCount: 0,
         goodItemsCollected: 0,
       };
+
+      createGameSession().then(sessionId => {
+        if (sessionId) {
+          console.log('Created session:', sessionId);
+          // We need to update the sessionId in the state
+          // This is done via a separate action since this is async
+          if (sessionId) {
+            newState.sessionId = sessionId;
+          }
+        }
+      });
+
+      return newState;
     }
 
     case 'COLLECT_ITEM': {
@@ -51,9 +60,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       // Game is over when user has made exactly 10 choices
       const isGameOver = newAttemptCount >= MAX_ATTEMPTS;
 
-      // Only update session hits if game is over and we collected good items
-      if (isGameOver && goodItemsCollected > 0) {
+      // Update session hits if the item is good (immediately, not just at game over)
+      if (item.type === 'good' && state.sessionId) {
         updateSessionHits(state.sessionId, goodItemsCollected);
+        console.log(`Updated session hits: ${goodItemsCollected} for session ${state.sessionId}`);
+      }
+
+      // Additionally, update final hits count when game is over
+      if (isGameOver && goodItemsCollected > 0 && state.sessionId) {
+        updateSessionHits(state.sessionId, goodItemsCollected);
+        console.log(`Final update - session hits: ${goodItemsCollected} for session ${state.sessionId}`);
       }
 
       return {

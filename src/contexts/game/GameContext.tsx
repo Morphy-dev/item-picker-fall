@@ -34,6 +34,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const startGame = () => {
     dispatch({ type: 'START_GAME' });
+    dispatch({ type: 'GENERATE_ITEMS' });
   };
 
   const resetGame = () => {
