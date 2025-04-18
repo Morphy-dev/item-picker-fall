@@ -1,11 +1,12 @@
 
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import { GameState } from '@/types/game';
 import { gameReducer, initialState } from './gameReducer';
 import { GameAction } from './gameActions';
 import { useItemGeneration } from '@/hooks/useItemGeneration';
 import { useBatchDropping } from '@/hooks/useBatchDropping';
 import { useGameOver } from '@/hooks/useGameOver';
+import { createGameSession } from './sessionHandlers';
 
 const GameContext = createContext<{
   state: GameState;
@@ -24,6 +25,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
   useBatchDropping(state, dispatch);
   useGameOver(state);
 
+  // Create a session when the game starts
+  useEffect(() => {
+    if (state.isGameStarted && !state.sessionId) {
+      createGameSession().then(sessionId => {
+        if (sessionId) {
+          console.log('Created session with ID:', sessionId);
+          dispatch({ type: 'SET_SESSION_ID', sessionId });
+          dispatch({ type: 'GENERATE_ITEMS' });
+        }
+      });
+    }
+  }, [state.isGameStarted, state.sessionId]);
+
   const collectItem = (id: string) => {
     dispatch({ type: 'COLLECT_ITEM', id });
   };
@@ -34,7 +48,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const startGame = () => {
     dispatch({ type: 'START_GAME' });
-    dispatch({ type: 'GENERATE_ITEMS' });
   };
 
   const resetGame = () => {

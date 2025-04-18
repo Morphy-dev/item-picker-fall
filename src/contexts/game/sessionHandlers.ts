@@ -23,18 +23,29 @@ export async function createGameSession() {
 }
 
 export async function updateSessionHits(sessionId: string | null, hits: number) {
-  if (!sessionId || hits <= 0) return;
+  if (!sessionId) {
+    console.error('Cannot update hits: No session ID provided');
+    return;
+  }
+  
+  if (hits <= 0) {
+    console.log(`Not updating hits (${hits}) for session ${sessionId}`);
+    return;
+  }
   
   try {
-    const { error } = await supabase
+    console.log(`Updating session ${sessionId} with ${hits} hits`);
+    
+    const { data, error } = await supabase
       .from('another_weather_game')
       .update({ hits })
-      .eq('id', sessionId);
+      .eq('id', sessionId)
+      .select();
     
     if (error) {
       console.error('Error updating session hits:', error);
     } else {
-      console.log(`Successfully updated session ${sessionId} with ${hits} hits`);
+      console.log(`Successfully updated session ${sessionId} with ${hits} hits, response:`, data);
     }
   } catch (err) {
     console.error('Exception updating session hits:', err);

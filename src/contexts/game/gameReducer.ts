@@ -1,4 +1,3 @@
-
 import { GameState } from '@/types/game';
 import { GameAction } from './gameActions';
 import { createGameSession, updateSessionHits } from './sessionHandlers';
@@ -25,26 +24,21 @@ export const initialState: GameState = {
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case 'START_GAME': {
-      // Create a new session when starting the game and store the session ID
-      const newState = {
+      // Create a new session immediately and wait for it before proceeding
+      return {
         ...state,
         isGameStarted: true,
         attemptCount: 0,
         goodItemsCollected: 0,
       };
+    }
 
-      createGameSession().then(sessionId => {
-        if (sessionId) {
-          console.log('Created session:', sessionId);
-          // We need to update the sessionId in the state
-          // This is done via a separate action since this is async
-          if (sessionId) {
-            newState.sessionId = sessionId;
-          }
-        }
-      });
-
-      return newState;
+    case 'SET_SESSION_ID': {
+      // This action is dispatched after a session is created
+      return {
+        ...state,
+        sessionId: action.sessionId
+      };
     }
 
     case 'COLLECT_ITEM': {
@@ -55,21 +49,21 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const newAttemptCount = state.attemptCount + 1;
       
       // Only increment goodItemsCollected if the item is good
-      const goodItemsCollected = item.type === 'good' ? state.goodItemsCollected + 1 : state.goodItemsCollected;
+      const newGoodItemsCollected = item.type === 'good' ? state.goodItemsCollected + 1 : state.goodItemsCollected;
       
       // Game is over when user has made exactly 10 choices
       const isGameOver = newAttemptCount >= MAX_ATTEMPTS;
 
       // Update session hits if the item is good (immediately, not just at game over)
       if (item.type === 'good' && state.sessionId) {
-        updateSessionHits(state.sessionId, goodItemsCollected);
-        console.log(`Updated session hits: ${goodItemsCollected} for session ${state.sessionId}`);
+        updateSessionHits(state.sessionId, newGoodItemsCollected);
+        console.log(`Updated session hits: ${newGoodItemsCollected} for session ${state.sessionId}`);
       }
 
       // Additionally, update final hits count when game is over
-      if (isGameOver && goodItemsCollected > 0 && state.sessionId) {
-        updateSessionHits(state.sessionId, goodItemsCollected);
-        console.log(`Final update - session hits: ${goodItemsCollected} for session ${state.sessionId}`);
+      if (isGameOver && newGoodItemsCollected > 0 && state.sessionId) {
+        updateSessionHits(state.sessionId, newGoodItemsCollected);
+        console.log(`Final update - session hits: ${newGoodItemsCollected} for session ${state.sessionId}`);
       }
 
       return {
@@ -78,7 +72,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           item.id === action.id ? { ...item, collected: true } : item
         ),
         score: item.type === 'good' ? state.score + 10 : state.score - 5,
-        goodItemsCollected,
+        goodItemsCollected: newGoodItemsCollected,
         attemptCount: newAttemptCount,
         isGameOver,
       };
