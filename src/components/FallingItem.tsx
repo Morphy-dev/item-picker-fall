@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Item } from '@/types/game';
 import { useGame } from '@/contexts/game/GameContext';
@@ -13,14 +13,27 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
   const { collectItem, missItem, pauseStream, resumeStream } = useGame();
   const { playSequentialSounds } = useSoundEffects();
   const itemRef = useRef<HTMLDivElement>(null);
+  const [isSelected, setIsSelected] = useState(false);
 
   const handleClick = () => {
     if (!item.collected && !item.missed) {
+      setIsSelected(true);
       pauseStream();
-      // Remove await - let sounds play in background
-      playSequentialSounds(['select', item.type === 'good' ? 'correct' : 'wrong']);
-      collectItem(item.id);
-      resumeStream();
+      // Pause all falling animations
+      document.querySelectorAll('.animate-fall').forEach((el) => {
+        el.classList.add('animate-pause');
+      });
+
+      // Play sounds and handle completion
+      playSequentialSounds(['select', item.type === 'good' ? 'correct' : 'wrong'])
+        .then(() => {
+          collectItem(item.id);
+          // Resume animations
+          document.querySelectorAll('.animate-fall').forEach((el) => {
+            el.classList.remove('animate-pause');
+          });
+          resumeStream();
+        });
     }
   };
 
@@ -29,8 +42,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
     if (!element) return;
 
     const handleAnimationEnd = () => {
-      if (!item.collected) {
-        // This only marks the item as missed visually, but doesn't count toward the attempt count
+      if (!item.collected && !isSelected) {
         missItem(item.id);
       }
     };
@@ -39,7 +51,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
     return () => {
       element.removeEventListener('animationend', handleAnimationEnd);
     };
-  }, [item, missItem]);
+  }, [item, missItem, isSelected]);
 
   if (item.collected || item.missed) return null;
 
@@ -47,14 +59,15 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
     <div
       ref={itemRef}
       className={cn(
-        "absolute cursor-pointer transform transition-transform",
-        "animate-fall hover:scale-125",
-        "motion-reduce:transition-none motion-reduce:hover:transform-none"
+        "absolute cursor-pointer transform transition-all duration-300",
+        "animate-fall hover:scale-110",
+        "motion-reduce:transition-none motion-reduce:hover:transform-none",
+        isSelected && "fixed inset-0 m-auto w-16 h-16 scale-200 z-50 pointer-events-none"
       )}
       style={{
-        left: `${item.x}%`,
+        left: isSelected ? 'calc(50% - 32px)' : `${item.x}%`,
+        top: isSelected ? 'calc(50% - 32px)' : undefined,
         '--fall-duration': `${item.speed}s`,
-        transition: 'transform 0.2s ease-in-out',
       } as React.CSSProperties}
       onClick={handleClick}
     >
