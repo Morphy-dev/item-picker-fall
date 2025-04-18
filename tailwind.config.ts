@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 import { FALL_SPEED } from "./src/contexts/game/constants";
 
@@ -113,18 +112,18 @@ export default {
           '0%': { transform: 'rotate(0deg) scale(1)', opacity: '1' },
           '100%': { transform: 'rotate(360deg) scale(0)', opacity: '0' }
         },
-        'pause': {
-          'from': { animationPlayState: 'running' },
-          'to': { animationPlayState: 'paused' }
+        'fade-out': {
+          '0%': { opacity: '1', transform: 'scale(2) translate(-25%, -25%)' },
+          '100%': { opacity: '0', transform: 'scale(2) translate(-25%, -25%)' }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'fall': 'fall 30s linear forwards', // Hardcoded to 30s to ensure it works
+        'fall': `fall ${FALL_SPEED}s linear forwards`,
         'fade-in': 'fade-in 0.3s ease-out',
         'scale-up': 'scale-up 0.3s ease-out',
-        'spin-fade': 'spin-fade 0.5s ease-out forwards',
+        'fade-out': 'fade-out 0.5s ease-out forwards',
         'pause': 'pause forwards'
       }
     }

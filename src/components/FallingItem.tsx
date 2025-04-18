@@ -15,6 +15,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
   const { playSequentialSounds } = useSoundEffects();
   const itemRef = useRef<HTMLDivElement>(null);
   const [isSelected, setIsSelected] = useState(false);
+  const [isDisappearing, setIsDisappearing] = useState(false);
 
   const handleClick = () => {
     if (!item.collected && !item.missed) {
@@ -28,12 +29,15 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       // Play sounds and handle completion
       playSequentialSounds(['select', item.type === 'good' ? 'correct' : 'wrong'])
         .then(() => {
-          collectItem(item.id);
-          // Resume animations
-          document.querySelectorAll('.animate-fall').forEach((el) => {
-            el.classList.remove('animate-pause');
-          });
-          resumeStream();
+          setIsDisappearing(true);
+          setTimeout(() => {
+            collectItem(item.id);
+            // Resume animations
+            document.querySelectorAll('.animate-fall').forEach((el) => {
+              el.classList.remove('animate-pause');
+            });
+            resumeStream();
+          }, 500); // Match the fade-out animation duration
         });
     }
   };
@@ -63,13 +67,15 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
         "absolute cursor-pointer transform transition-all duration-300",
         "animate-fall hover:scale-110",
         "motion-reduce:transition-none motion-reduce:hover:transform-none",
-        isSelected && "fixed inset-0 m-auto w-16 h-16 scale-200 z-50 pointer-events-none"
+        isSelected && "fixed inset-0 m-auto w-16 h-16 scale-200 z-50",
+        isDisappearing && "animate-fade-out pointer-events-none"
       )}
       style={{
-        left: isSelected ? 'calc(50% - 32px)' : `${item.x}%`,
-        top: isSelected ? 'calc(50% - 32px)' : '-100px', // Start above viewport
-        animationDuration: `${FALL_SPEED}s`, // Set animation duration directly
-      } as React.CSSProperties}
+        left: isSelected ? '50%' : `${item.x}%`,
+        top: isSelected ? '50%' : '-100px',
+        transform: isSelected ? 'translate(-50%, -50%)' : 'none',
+        animationDuration: `${FALL_SPEED}s`,
+      }}
       onClick={handleClick}
     >
       <img 
