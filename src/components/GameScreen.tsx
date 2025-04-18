@@ -46,7 +46,6 @@ const GameScreen: React.FC = () => {
               <Progress 
                 value={(goodItemsCollected / goodItems) * 100} 
                 className="h-2 bg-white/20" 
-                indicatorClassName="bg-game-good" 
               />
             </div>
           </div>
