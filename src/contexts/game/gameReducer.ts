@@ -1,8 +1,9 @@
-import { GameState, Item } from '@/types/game';
-import { GameAction, weatherItems } from './gameActions';
-import { supabase } from "@/integrations/supabase/client";
 
-const FALL_SPEED = 6; // Fall duration in seconds
+import { GameState } from '@/types/game';
+import { GameAction } from './gameActions';
+import { createGameSession, updateSessionHits } from './sessionHandlers';
+import { generateItems } from './itemGenerators';
+import { TOTAL_ITEMS, GOOD_ITEMS, MAX_ATTEMPTS } from './constants';
 
 export const initialState: GameState = {
   items: [],
@@ -11,9 +12,9 @@ export const initialState: GameState = {
   currentBatchIndex: 0,
   score: 0,
   goodItemsCollected: 0,
-  totalItems: 50, // Increased to allow more items in the stream
-  goodItems: 15, // Increased good items to maintain ratio
-  remainingItems: 50,
+  totalItems: TOTAL_ITEMS,
+  goodItems: GOOD_ITEMS,
+  remainingItems: TOTAL_ITEMS,
   isGameOver: false,
   isGameStarted: false,
   isStreamPaused: false,
@@ -24,18 +25,7 @@ export const initialState: GameState = {
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case 'START_GAME': {
-      const createSession = async () => {
-        const { data, error } = await supabase
-          .from('another_weather_game')
-          .insert([{ hits: 0 }])
-          .select()
-          .single();
-        
-        if (error) console.error('Error creating session:', error);
-        return data?.id;
-      };
-
-      createSession().then(sessionId => {
+      createGameSession().then(sessionId => {
         if (sessionId) {
           console.log('Created session:', sessionId);
         }
@@ -55,16 +45,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       const newAttemptCount = state.attemptCount + 1;
       const goodItemsCollected = item.type === 'good' ? state.goodItemsCollected + 1 : state.goodItemsCollected;
-      const isGameOver = newAttemptCount >= 10;
+      const isGameOver = newAttemptCount >= MAX_ATTEMPTS;
 
       if (isGameOver && goodItemsCollected > 0) {
-        supabase
-          .from('another_weather_game')
-          .update({ hits: goodItemsCollected })
-          .eq('id', state.sessionId)
-          .then(({ error }) => {
-            if (error) console.error('Error updating session:', error);
-          });
+        updateSessionHits(state.sessionId, goodItemsCollected);
       }
 
       return {
@@ -84,16 +68,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (!item || item.missed || item.collected) return state;
 
       const newAttemptCount = state.attemptCount + 1;
-      const isGameOver = newAttemptCount >= 10;
+      const isGameOver = newAttemptCount >= MAX_ATTEMPTS;
 
       if (isGameOver && state.goodItemsCollected > 0) {
-        supabase
-          .from('another_weather_game')
-          .update({ hits: state.goodItemsCollected })
-          .eq('id', state.sessionId)
-          .then(({ error }) => {
-            if (error) console.error('Error updating session:', error);
-          });
+        updateSessionHits(state.sessionId, state.goodItemsCollected);
       }
 
       return {
@@ -107,48 +85,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'GENERATE_ITEMS': {
-      const goodItems = Array.from({ length: state.goodItems }, (_, i) => ({
-        id: `good-${i}`,
-        type: 'good' as const,
-        x: Math.random() * 80 + 10,
-        speed: FALL_SPEED,
-        collected: false,
-        missed: false,
-        icon: weatherItems[0].icon,
-        name: weatherItems[0].name
-      }));
-
-      const badItems = Array.from({ length: state.totalItems - state.goodItems }, (_, i) => {
-        const badItemIndex = 1 + (i % (weatherItems.length - 1)); // Skip first item (sunny) and cycle through others
-        return {
-          id: `bad-${i}`,
-          type: 'bad' as const,
-          x: Math.random() * 80 + 10,
-          speed: FALL_SPEED,
-          collected: false,
-          missed: false,
-          icon: weatherItems[badItemIndex].icon,
-          name: weatherItems[badItemIndex].name
-        };
-      });
-
-      const allItems = [...goodItems, ...badItems];
-      for (let i = allItems.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allItems[i], allItems[j]] = [allItems[j], allItems[i]];
-      }
-
-      const batches: Item[][] = [];
-      let currentIndex = 0;
+      const { items, batches } = generateItems(state.totalItems, state.goodItems);
       
-      while (currentIndex < allItems.length) {
-        batches.push([allItems[currentIndex]]);
-        currentIndex++;
-      }
-
       return {
         ...state,
-        items: allItems,
+        items,
         batches,
         activeItems: batches[0] || [],
         currentBatchIndex: 0,
