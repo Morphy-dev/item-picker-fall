@@ -1,3 +1,4 @@
+
 export const FALL_SPEED = 8; // Fall duration in seconds
 export const TOTAL_ITEMS = 50; // Total items that can potentially drop
 export const GOOD_ITEMS = 15; // Number of good items among the total

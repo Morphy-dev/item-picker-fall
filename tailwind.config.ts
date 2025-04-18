@@ -108,10 +108,6 @@ export default {
           '0%': { transform: 'scale(0.8)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' }
         },
-        'spin-fade': {
-          '0%': { transform: 'rotate(0deg) scale(1)', opacity: '1' },
-          '100%': { transform: 'rotate(360deg) scale(0)', opacity: '0' }
-        },
         'fade-out': {
           '0%': { opacity: '1', transform: 'scale(2) translate(-25%, -25%)' },
           '100%': { opacity: '0', transform: 'scale(2) translate(-25%, -25%)' }
@@ -124,7 +120,7 @@ export default {
         'fade-in': 'fade-in 0.3s ease-out',
         'scale-up': 'scale-up 0.3s ease-out',
         'fade-out': 'fade-out 0.5s ease-out forwards',
-        'pause': 'pause forwards'
+        'pause': 'paused'
       }
     }
   },

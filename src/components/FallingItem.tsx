@@ -21,6 +21,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
     if (!item.collected && !item.missed) {
       setIsSelected(true);
       pauseStream();
+      
       // Pause all falling animations
       document.querySelectorAll('.animate-fall').forEach((el) => {
         el.classList.add('animate-pause');
@@ -32,7 +33,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
           setIsDisappearing(true);
           setTimeout(() => {
             collectItem(item.id);
-            // Resume animations
+            // Resume animations for other items
             document.querySelectorAll('.animate-fall').forEach((el) => {
               el.classList.remove('animate-pause');
             });
@@ -66,15 +67,17 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       className={cn(
         "absolute cursor-pointer transform transition-all duration-300",
         "animate-fall hover:scale-110",
-        "motion-reduce:transition-none motion-reduce:hover:transform-none",
-        isSelected && "fixed inset-0 m-auto w-16 h-16 scale-200 z-50",
-        isDisappearing && "animate-fade-out pointer-events-none"
+        isSelected ? "fixed z-50" : "", 
+        isDisappearing ? "opacity-0" : "",
+        "motion-reduce:transition-none motion-reduce:hover:transform-none"
       )}
       style={{
         left: isSelected ? '50%' : `${item.x}%`,
         top: isSelected ? '50%' : '-100px',
-        transform: isSelected ? 'translate(-50%, -50%)' : 'none',
+        transform: isSelected ? 'translate(-50%, -50%) scale(2)' : 'none',
         animationDuration: `${FALL_SPEED}s`,
+        transitionProperty: isSelected ? 'opacity, transform, left, top' : 'transform',
+        transitionDuration: isSelected ? '0.5s' : '0.3s'
       }}
       onClick={handleClick}
     >
