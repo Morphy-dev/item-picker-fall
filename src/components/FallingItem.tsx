@@ -67,8 +67,8 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       )}
       style={{
         left: isSelected ? 'calc(50% - 32px)' : `${item.x}%`,
-        top: isSelected ? 'calc(50% - 32px)' : undefined,
-        '--fall-duration': `${FALL_SPEED}s`,
+        top: isSelected ? 'calc(50% - 32px)' : '-100px', // Start above viewport
+        animationDuration: `${FALL_SPEED}s`, // Set animation duration directly
       } as React.CSSProperties}
       onClick={handleClick}
     >

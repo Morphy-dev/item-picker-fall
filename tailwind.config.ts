@@ -1,5 +1,6 @@
 
 import type { Config } from "tailwindcss";
+import { FALL_SPEED } from "./src/contexts/game/constants";
 
 export default {
   darkMode: ["class"],
@@ -120,7 +121,7 @@ export default {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'fall': 'fall var(--fall-duration, 30s) linear forwards', // Updated default to 30s to match our constant
+        'fall': 'fall 30s linear forwards', // Hardcoded to 30s to ensure it works
         'fade-in': 'fade-in 0.3s ease-out',
         'scale-up': 'scale-up 0.3s ease-out',
         'spin-fade': 'spin-fade 0.5s ease-out forwards',
