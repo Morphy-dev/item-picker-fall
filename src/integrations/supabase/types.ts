@@ -44,6 +44,27 @@ export type Database = {
           },
         ]
       }
+      another_weather_game: {
+        Row: {
+          created_at: string
+          hits: number
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          hits?: number
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          hits?: number
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       avance_estudiante: {
         Row: {
           actividad_id: string | null

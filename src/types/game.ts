@@ -1,3 +1,4 @@
+
 export interface Item {
   id: string;
   type: 'good' | 'bad';
@@ -22,4 +23,6 @@ export interface GameState {
   isGameOver: boolean;
   isGameStarted: boolean;
   isStreamPaused: boolean;
+  sessionId: string | null;
+  attemptCount: number;
 }

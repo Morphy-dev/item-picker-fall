@@ -1,5 +1,6 @@
 import { GameState, Item } from '@/types/game';
 import { GameAction, weatherItems } from './gameActions';
+import { supabase } from "@/integrations/supabase/client";
 
 export const initialState: GameState = {
   items: [],
@@ -8,41 +9,71 @@ export const initialState: GameState = {
   currentBatchIndex: 0,
   score: 0,
   goodItemsCollected: 0,
-  totalItems: 50,
-  goodItems: 10,
-  remainingItems: 50,
+  totalItems: 10,
+  goodItems: 3,
+  remainingItems: 10,
   isGameOver: false,
   isGameStarted: false,
   isStreamPaused: false,
+  sessionId: null,
+  attemptCount: 0,
 };
-
-const FALL_SPEED = 8; // Constant fall speed in seconds
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
-    case 'START_GAME':
+    case 'START_GAME': {
+      const createSession = async () => {
+        const { data, error } = await supabase
+          .from('another_weather_game')
+          .insert([{ hits: 0 }])
+          .select()
+          .single();
+        
+        if (error) console.error('Error creating session:', error);
+        return data?.id;
+      };
+
+      createSession().then(sessionId => {
+        if (sessionId) {
+          console.log('Created session:', sessionId);
+        }
+      });
+
       return {
         ...state,
         isGameStarted: true,
+        attemptCount: 0,
       };
+    }
 
     case 'COLLECT_ITEM': {
       const item = state.activeItems.find((item) => item.id === action.id);
       if (!item || item.collected) return state;
 
-      const newScore = item.type === 'good' ? state.score + 10 : state.score - 5;
+      const newAttemptCount = state.attemptCount + 1;
       const goodItemsCollected = item.type === 'good' ? state.goodItemsCollected + 1 : state.goodItemsCollected;
       const remainingItems = state.remainingItems - 1;
-      const isGameOver = remainingItems === 0 || goodItemsCollected === state.goodItems;
+      const isGameOver = newAttemptCount >= 10;
+
+      if (isGameOver) {
+        supabase
+          .from('another_weather_game')
+          .update({ hits: goodItemsCollected })
+          .eq('id', state.sessionId)
+          .then(({ error }) => {
+            if (error) console.error('Error updating session:', error);
+          });
+      }
 
       return {
         ...state,
         activeItems: state.activeItems.map((item) =>
           item.id === action.id ? { ...item, collected: true } : item
         ),
-        score: newScore,
+        score: item.type === 'good' ? state.score + 10 : state.score - 5,
         goodItemsCollected,
         remainingItems,
+        attemptCount: newAttemptCount,
         isGameOver,
       };
     }
@@ -51,9 +82,19 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const item = state.activeItems.find((item) => item.id === action.id);
       if (!item || item.missed || item.collected) return state;
 
+      const newAttemptCount = state.attemptCount + 1;
       const remainingItems = state.remainingItems - 1;
-      const goodItemsMissed = item.type === 'good' ? 1 : 0;
-      const isGameOver = remainingItems === 0 || state.goodItems - state.goodItemsCollected - goodItemsMissed < 0;
+      const isGameOver = newAttemptCount >= 10;
+
+      if (isGameOver) {
+        supabase
+          .from('another_weather_game')
+          .update({ hits: state.goodItemsCollected })
+          .eq('id', state.sessionId)
+          .then(({ error }) => {
+            if (error) console.error('Error updating session:', error);
+          });
+      }
 
       return {
         ...state,
@@ -61,6 +102,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           item.id === action.id ? { ...item, missed: true } : item
         ),
         remainingItems,
+        attemptCount: newAttemptCount,
         isGameOver,
       };
     }
@@ -91,14 +133,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         };
       });
 
-      // Combine and shuffle all items
       const allItems = [...goodItems, ...badItems];
       for (let i = allItems.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [allItems[i], allItems[j]] = [allItems[j], allItems[i]];
       }
 
-      // Create smaller batches for more frequent drops
       const batches: Item[][] = [];
       let currentIndex = 0;
       
