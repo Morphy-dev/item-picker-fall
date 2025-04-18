@@ -21,4 +21,5 @@ export interface GameState {
   remainingItems: number;
   isGameOver: boolean;
   isGameStarted: boolean;
+  isStreamPaused: boolean;
 }
