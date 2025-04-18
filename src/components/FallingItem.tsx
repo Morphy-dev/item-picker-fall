@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Item } from '@/types/game';
@@ -61,26 +60,22 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
 
   if (item.collected || item.missed) return null;
 
-  // Calculate the center position of the viewport
-  const viewportCenterX = 50; // 50% of viewport width
-  const viewportCenterY = 50; // 50% of viewport height
-
   return (
     <div
       ref={itemRef}
       className={cn(
         "absolute cursor-pointer transform transition-all duration-300",
         "animate-fall hover:scale-110",
-        isSelected ? "fixed z-50" : "", 
+        isSelected ? "fixed inset-0 m-auto w-16 h-16 z-50" : "", 
         isDisappearing ? "opacity-0" : "",
         "motion-reduce:transition-none motion-reduce:hover:transform-none"
       )}
       style={{
-        left: isSelected ? `${viewportCenterX}%` : `${item.x}%`,
-        top: isSelected ? `${viewportCenterY}%` : '-100px',
-        transform: isSelected ? 'translate(-50%, -50%) scale(2)' : 'none',
+        left: isSelected ? undefined : `${item.x}%`,
+        top: isSelected ? undefined : '-100px',
+        transform: isSelected ? 'scale(2)' : 'none',
         animationDuration: `${FALL_SPEED}s`,
-        transitionProperty: isSelected ? 'opacity, transform, left, top' : 'transform',
+        transitionProperty: isSelected ? 'opacity, transform' : 'transform',
         transitionDuration: isSelected ? '0.5s' : '0.3s'
       }}
       onClick={handleClick}
