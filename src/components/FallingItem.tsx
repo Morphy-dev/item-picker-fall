@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Item } from '@/types/game';
@@ -66,7 +67,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       className={cn(
         "absolute cursor-pointer transform transition-all duration-300",
         "animate-fall hover:scale-110",
-        isSelected ? "fixed inset-0 m-auto w-16 h-16 z-50" : "", 
+        isSelected ? "absolute inset-0 flex items-center justify-center z-50" : "", 
         isDisappearing ? "opacity-0" : "",
         "motion-reduce:transition-none motion-reduce:hover:transform-none"
       )}
