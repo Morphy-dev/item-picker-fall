@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Item } from '@/types/game';
@@ -28,6 +29,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
 
     const handleAnimationEnd = () => {
       if (!item.collected) {
+        // This only marks the item as missed visually, but doesn't count toward the attempt count
         missItem(item.id);
       }
     };

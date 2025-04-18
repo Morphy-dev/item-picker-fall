@@ -1,4 +1,3 @@
-
 import { GameState } from '@/types/game';
 import { GameAction } from './gameActions';
 import { createGameSession, updateSessionHits } from './sessionHandlers';
@@ -43,7 +42,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const item = state.activeItems.find((item) => item.id === action.id);
       if (!item || item.collected) return state;
 
-      // Increment attempt count for any item collection (good or bad)
+      // Increment attempt count for any item collection (user's choice)
       const newAttemptCount = state.attemptCount + 1;
       
       // Only increment goodItemsCollected if the item is good
@@ -73,24 +72,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const item = state.activeItems.find((item) => item.id === action.id);
       if (!item || item.missed || item.collected) return state;
 
-      // Increment attempt count for any item miss action
-      const newAttemptCount = state.attemptCount + 1;
-      
-      // Game is over when user has made exactly 10 choices
-      const isGameOver = newAttemptCount >= MAX_ATTEMPTS;
-
-      // Only update session hits if game is over and we collected good items
-      if (isGameOver && state.goodItemsCollected > 0) {
-        updateSessionHits(state.sessionId, state.goodItemsCollected);
-      }
-
+      // Don't count missed items toward the attempt count anymore
+      // Simply mark them as missed without affecting the game state otherwise
       return {
         ...state,
         activeItems: state.activeItems.map((item) =>
           item.id === action.id ? { ...item, missed: true } : item
         ),
-        attemptCount: newAttemptCount,
-        isGameOver,
       };
     }
 
