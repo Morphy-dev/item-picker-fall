@@ -1,6 +1,17 @@
 
 import { Item } from '@/types/game';
 
+// Define the weather items that will be used in the game
+export const weatherItems = [
+  { name: 'Sun', icon: '☀️' }, // Good item
+  { name: 'Rain', icon: '🌧️' },
+  { name: 'Storm', icon: '⛈️' },
+  { name: 'Snow', icon: '❄️' },
+  { name: 'Fog', icon: '🌫️' },
+  { name: 'Wind', icon: '💨' },
+  { name: 'Cloud', icon: '☁️' },
+];
+
 export type GameAction =
   | { type: 'START_GAME' }
   | { type: 'RESET_GAME' }
