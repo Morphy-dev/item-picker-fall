@@ -61,6 +61,10 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
 
   if (item.collected || item.missed) return null;
 
+  // Calculate the center position of the viewport
+  const viewportCenterX = 50; // 50% of viewport width
+  const viewportCenterY = 50; // 50% of viewport height
+
   return (
     <div
       ref={itemRef}
@@ -72,8 +76,8 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
         "motion-reduce:transition-none motion-reduce:hover:transform-none"
       )}
       style={{
-        left: isSelected ? '50%' : `${item.x}%`,
-        top: isSelected ? '50%' : '-100px',
+        left: isSelected ? `${viewportCenterX}%` : `${item.x}%`,
+        top: isSelected ? `${viewportCenterY}%` : '-100px',
         transform: isSelected ? 'translate(-50%, -50%) scale(2)' : 'none',
         animationDuration: `${FALL_SPEED}s`,
         transitionProperty: isSelected ? 'opacity, transform, left, top' : 'transform',
