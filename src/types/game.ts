@@ -11,6 +11,9 @@ export interface Item {
 
 export interface GameState {
   items: Item[];
+  activeItems: Item[];
+  batches: Item[][];
+  currentBatchIndex: number;
   score: number;
   goodItemsCollected: number;
   totalItems: number;
