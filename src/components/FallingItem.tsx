@@ -22,21 +22,13 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       setIsSelected(true);
       pauseStream();
       
-      // Pause all falling animations
-      document.querySelectorAll('.animate-fall').forEach((el) => {
-        el.classList.add('animate-pause');
-      });
-
       // Play sounds and handle completion
       playSequentialSounds(['select', item.type === 'good' ? 'correct' : 'wrong'])
         .then(() => {
+          // After sounds complete, start disappearing
           setIsDisappearing(true);
           setTimeout(() => {
             collectItem(item.id);
-            // Resume animations for other items
-            document.querySelectorAll('.animate-fall').forEach((el) => {
-              el.classList.remove('animate-pause');
-            });
             resumeStream();
           }, 500); // Match the fade-out animation duration
         });
