@@ -2,6 +2,8 @@ import { GameState, Item } from '@/types/game';
 import { GameAction, weatherItems } from './gameActions';
 import { supabase } from "@/integrations/supabase/client";
 
+const FALL_SPEED = 6; // Fall duration in seconds
+
 export const initialState: GameState = {
   items: [],
   activeItems: [],
