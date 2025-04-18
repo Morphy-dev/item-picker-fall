@@ -40,7 +40,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
     <div
       ref={itemRef}
       className={cn(
-        "absolute text-4xl cursor-pointer transform transition-transform",
+        "absolute text-6xl cursor-pointer transform transition-transform",
         "animate-fall hover:scale-125",
         item.collected && "animate-spin-fade"
       )}

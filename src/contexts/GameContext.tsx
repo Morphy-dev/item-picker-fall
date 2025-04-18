@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import { GameState, Item } from '@/types/game';
 import { useToast } from '@/hooks/use-toast';
@@ -70,12 +69,16 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
     case 'GENERATE_ITEMS': {
-      // Create an array of good and bad items
+      // Create batches of 2-3 items
+      const batchSize = Math.floor(state.totalItems / 20); // This will create about 20 batches
+      const batches: Item[][] = [];
+      
+      let currentIndex = 0;
       const goodItems = Array.from({ length: state.goodItems }, (_, i) => ({
         id: `good-${i}`,
         type: 'good' as const,
-        x: Math.random() * 80 + 10, // Random position (10-90%)
-        speed: Math.random() * 3 + 2, // Random speed (2-5s)
+        x: Math.random() * 80 + 10,
+        speed: Math.random() * 2 + 5, // 5-7 seconds fall duration
         collected: false,
         missed: false,
         icon: goodIcons[i % goodIcons.length],
@@ -84,23 +87,30 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       const badItems = Array.from({ length: state.totalItems - state.goodItems }, (_, i) => ({
         id: `bad-${i}`,
         type: 'bad' as const,
-        x: Math.random() * 80 + 10, // Random position (10-90%)
-        speed: Math.random() * 3 + 2, // Random speed (2-5s)
+        x: Math.random() * 80 + 10,
+        speed: Math.random() * 2 + 5, // 5-7 seconds fall duration
         collected: false,
         missed: false,
         icon: badIcons[i % badIcons.length],
       }));
 
-      // Combine and shuffle items
-      const items = [...goodItems, ...badItems];
-      for (let i = items.length - 1; i > 0; i--) {
+      // Combine and shuffle all items
+      const allItems = [...goodItems, ...badItems];
+      for (let i = allItems.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [items[i], items[j]] = [items[j], items[i]];
+        [allItems[i], allItems[j]] = [allItems[j], allItems[i]];
+      }
+
+      // Create batches of 2-3 items
+      while (currentIndex < allItems.length) {
+        const batchSize = Math.floor(Math.random() * 2) + 2; // Random size between 2-3
+        batches.push(allItems.slice(currentIndex, currentIndex + batchSize));
+        currentIndex += batchSize;
       }
 
       return {
         ...state,
-        items,
+        items: allItems,
       };
     }
     case 'RESET_GAME':
