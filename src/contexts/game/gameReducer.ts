@@ -93,14 +93,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         [allItems[i], allItems[j]] = [allItems[j], allItems[i]];
       }
 
-      // Create batches of 2-3 items
+      // Create smaller batches for more frequent drops
       const batches: Item[][] = [];
       let currentIndex = 0;
       
       while (currentIndex < allItems.length) {
-        const batchSize = Math.floor(Math.random() * 2) + 2;
-        batches.push(allItems.slice(currentIndex, Math.min(currentIndex + batchSize, allItems.length)));
-        currentIndex += batchSize;
+        batches.push([allItems[currentIndex]]);
+        currentIndex++;
       }
 
       return {
@@ -112,16 +111,43 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
-    case 'DROP_NEXT_BATCH': {
+    case 'DROP_NEXT_ITEM': {
       const nextBatchIndex = state.currentBatchIndex + 1;
       if (nextBatchIndex >= state.batches.length) {
         return state;
       }
 
+      const activeItemsCount = state.activeItems.filter(item => !item.collected && !item.missed).length;
+      if (activeItemsCount >= 3) return state;
+
       return {
         ...state,
-        activeItems: [...state.activeItems.filter(item => !item.collected && !item.missed), ...state.batches[nextBatchIndex]],
+        activeItems: [
+          ...state.activeItems.filter(item => !item.collected && !item.missed),
+          ...state.batches[nextBatchIndex]
+        ],
         currentBatchIndex: nextBatchIndex,
+      };
+    }
+
+    case 'DROP_TWO_ITEMS': {
+      const nextBatchIndex = state.currentBatchIndex + 1;
+      if (nextBatchIndex >= state.batches.length - 1) {
+        return state;
+      }
+
+      const activeItemsCount = state.activeItems.filter(item => !item.collected && !item.missed).length;
+      if (activeItemsCount >= 3) return state;
+
+      const newItems = state.batches.slice(nextBatchIndex, nextBatchIndex + 2).flat();
+
+      return {
+        ...state,
+        activeItems: [
+          ...state.activeItems.filter(item => !item.collected && !item.missed),
+          ...newItems
+        ].slice(0, 3),
+        currentBatchIndex: nextBatchIndex + 1,
       };
     }
 
