@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Item } from '@/types/game';
@@ -45,19 +44,22 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
     <div
       ref={itemRef}
       className={cn(
-        "absolute text-6xl cursor-pointer transform transition-transform",
+        "absolute cursor-pointer transform transition-transform",
         "animate-fall hover:scale-125",
-        "motion-reduce:transition-none motion-reduce:hover:transform-none", // Add smooth motion
-        item.collected && "animate-spin-fade"
+        "motion-reduce:transition-none motion-reduce:hover:transform-none"
       )}
       style={{
         left: `${item.x}%`,
         '--fall-duration': `${item.speed}s`,
-        transition: 'transform 0.2s ease-in-out', // Smooth hover effect
+        transition: 'transform 0.2s ease-in-out',
       } as React.CSSProperties}
       onClick={handleClick}
     >
-      <span className="inline-block">{item.icon}</span>
+      <img 
+        src={item.icon} 
+        alt={item.name}
+        className="w-16 h-16 object-contain"
+      />
     </div>
   );
 };

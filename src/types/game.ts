@@ -1,4 +1,3 @@
-
 export interface Item {
   id: string;
   type: 'good' | 'bad';
@@ -7,6 +6,7 @@ export interface Item {
   collected: boolean;
   missed: boolean;
   icon: string;
+  name: string;
 }
 
 export interface GameState {

@@ -1,6 +1,5 @@
 import { GameState, Item } from '@/types/game';
-import { GameAction } from './gameActions';
-import { goodIcons, badIcons } from './gameActions';
+import { GameAction, weatherItems } from './gameActions';
 
 export const initialState: GameState = {
   items: [],
@@ -71,21 +70,26 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         id: `good-${i}`,
         type: 'good' as const,
         x: Math.random() * 80 + 10,
-        speed: FALL_SPEED, // Use constant speed instead of random
+        speed: FALL_SPEED,
         collected: false,
         missed: false,
-        icon: goodIcons[i % goodIcons.length],
+        icon: weatherItems[0].icon,
+        name: weatherItems[0].name
       }));
 
-      const badItems = Array.from({ length: state.totalItems - state.goodItems }, (_, i) => ({
-        id: `bad-${i}`,
-        type: 'bad' as const,
-        x: Math.random() * 80 + 10,
-        speed: FALL_SPEED, // Use constant speed instead of random
-        collected: false,
-        missed: false,
-        icon: badIcons[i % badIcons.length],
-      }));
+      const badItems = Array.from({ length: state.totalItems - state.goodItems }, (_, i) => {
+        const badItemIndex = 1 + (i % (weatherItems.length - 1)); // Skip first item (sunny) and cycle through others
+        return {
+          id: `bad-${i}`,
+          type: 'bad' as const,
+          x: Math.random() * 80 + 10,
+          speed: FALL_SPEED,
+          collected: false,
+          missed: false,
+          icon: weatherItems[badItemIndex].icon,
+          name: weatherItems[badItemIndex].name
+        };
+      });
 
       // Combine and shuffle all items
       const allItems = [...goodItems, ...badItems];
