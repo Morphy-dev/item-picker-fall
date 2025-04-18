@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,12 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				game: {
+					'good': '#22c55e',
+					'bad': '#ef4444',
+					'bg-start': '#4338ca',
+					'bg-end': '#3b82f6',
 				}
 			},
 			borderRadius: {
@@ -84,11 +91,32 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fall': {
+					'0%': { transform: 'translateY(-100px)', opacity: '0' },
+					'10%': { opacity: '1' },
+					'100%': { transform: 'translateY(calc(100vh - 100px))', opacity: '1' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'scale-up': {
+					'0%': { transform: 'scale(0.8)', opacity: '0' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
+				'spin-fade': {
+					'0%': { transform: 'rotate(0deg) scale(1)', opacity: '1' },
+					'100%': { transform: 'rotate(360deg) scale(0)', opacity: '0' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fall': 'fall var(--fall-duration, 4s) linear forwards',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'scale-up': 'scale-up 0.3s ease-out',
+				'spin-fade': 'spin-fade 0.5s ease-out forwards'
 			}
 		}
 	},
