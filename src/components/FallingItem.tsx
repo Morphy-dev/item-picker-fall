@@ -58,7 +58,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       ref={itemRef}
       className={cn(
         "absolute cursor-pointer transform transition-all",
-        !isSelected && "animate-fall hover:scale-110",
+        !isSelected && "animate-fall hover:scale-[2]", // Increased scale from 110% to 200%
         isSelected && "fixed inset-0 flex items-center justify-center z-50", 
         isDisappearing && "opacity-0",
         "motion-reduce:transition-none motion-reduce:hover:transform-none"
@@ -66,7 +66,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       style={{
         left: isSelected ? '50%' : `${item.x}%`,
         top: isSelected ? '50%' : '-100px',
-        transform: isSelected ? 'translate(-50%, -50%) scale(2)' : 'none',
+        transform: isSelected ? 'translate(-50%, -50%) scale(3)' : 'none', // Increased scale from 2 to 3
         animationDuration: `${FALL_SPEED}s`,
         animationPlayState: isSelected ? 'paused' : 'running',
         transition: isSelected 
@@ -78,7 +78,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       <img 
         src={item.icon} 
         alt={item.name}
-        className="w-16 h-16 object-contain"
+        className="w-24 h-24 object-contain" // Increased from w-16 h-16 to w-24 h-24
       />
     </div>
   );
