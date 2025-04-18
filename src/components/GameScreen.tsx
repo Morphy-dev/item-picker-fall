@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { usePlayInstructions } from '@/hooks/usePlayInstructions';
 import { Check, X } from 'lucide-react';
+import { MAX_ATTEMPTS } from '@/contexts/game/constants';
 
 const GameScreen: React.FC = () => {
   const { state, startGame, resetGame } = useGame();
@@ -18,8 +19,11 @@ const GameScreen: React.FC = () => {
     goodItems,
     remainingItems,
     isGameOver,
-    isGameStarted
+    isGameStarted,
+    attemptCount
   } = state;
+
+  const remainingChoices = MAX_ATTEMPTS - attemptCount;
 
   usePlayInstructions(isGameStarted, state.items.length > 0);
 
@@ -36,6 +40,10 @@ const GameScreen: React.FC = () => {
     <div className="relative w-full h-screen overflow-hidden bg-neutral-900">
       <div className="absolute top-0 left-0 right-0 z-10 p-4">
         <div className="container max-w-5xl mx-auto">
+          <div className="flex justify-between items-center mb-2 text-white">
+            <div>Score: {score}</div>
+            <div>Choices remaining: {remainingChoices}/10</div>
+          </div>
           <Progress 
             value={(goodItemsCollected / goodItems) * 100} 
             className="h-2 bg-white/20" 
@@ -80,9 +88,13 @@ const GameScreen: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span>Mistakes</span>
                 <div className="flex items-center gap-2">
-                  <span>{totalItems - goodItemsCollected - remainingItems}</span>
+                  <span>{attemptCount - goodItemsCollected}</span>
                   <X className="text-red-500" />
                 </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Total Score</span>
+                <span>{score}</span>
               </div>
             </div>
           </div>
