@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
+
+import React, { createContext, useContext, useReducer, ReactNode, useEffect, useState } from 'react';
 import { GameState, Item } from '@/types/game';
 import { useToast } from '@/hooks/use-toast';
 
@@ -11,10 +12,14 @@ type GameAction =
   | { type: 'COLLECT_ITEM'; id: string }
   | { type: 'MISS_ITEM'; id: string }
   | { type: 'GENERATE_ITEMS' }
+  | { type: 'DROP_NEXT_BATCH' }
   | { type: 'RESET_GAME' };
 
 const initialState: GameState = {
   items: [],
+  activeItems: [],
+  batches: [],
+  currentBatchIndex: 0,
   score: 0,
   goodItemsCollected: 0,
   totalItems: 50,
@@ -32,7 +37,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         isGameStarted: true,
       };
     case 'COLLECT_ITEM': {
-      const item = state.items.find((item) => item.id === action.id);
+      const item = state.activeItems.find((item) => item.id === action.id);
       if (!item || item.collected) return state;
 
       const newScore = item.type === 'good' ? state.score + 10 : state.score - 5;
@@ -42,7 +47,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
       return {
         ...state,
-        items: state.items.map((item) =>
+        activeItems: state.activeItems.map((item) =>
           item.id === action.id ? { ...item, collected: true } : item
         ),
         score: newScore,
@@ -52,7 +57,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
     case 'MISS_ITEM': {
-      const item = state.items.find((item) => item.id === action.id);
+      const item = state.activeItems.find((item) => item.id === action.id);
       if (!item || item.missed || item.collected) return state;
 
       const remainingItems = state.remainingItems - 1;
@@ -61,7 +66,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
       return {
         ...state,
-        items: state.items.map((item) =>
+        activeItems: state.activeItems.map((item) =>
           item.id === action.id ? { ...item, missed: true } : item
         ),
         remainingItems,
@@ -69,11 +74,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
     case 'GENERATE_ITEMS': {
-      // Create batches of 2-3 items
-      const batchSize = Math.floor(state.totalItems / 20); // This will create about 20 batches
-      const batches: Item[][] = [];
-      
-      let currentIndex = 0;
+      // Create array of good and bad items
       const goodItems = Array.from({ length: state.goodItems }, (_, i) => ({
         id: `good-${i}`,
         type: 'good' as const,
@@ -102,21 +103,42 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       }
 
       // Create batches of 2-3 items
+      const batches: Item[][] = [];
+      let currentIndex = 0;
+      
       while (currentIndex < allItems.length) {
         const batchSize = Math.floor(Math.random() * 2) + 2; // Random size between 2-3
-        batches.push(allItems.slice(currentIndex, currentIndex + batchSize));
+        batches.push(allItems.slice(currentIndex, Math.min(currentIndex + batchSize, allItems.length)));
         currentIndex += batchSize;
       }
 
       return {
         ...state,
         items: allItems,
+        batches,
+        activeItems: batches[0] || [], // Start with the first batch
+        currentBatchIndex: 0,
+      };
+    }
+    case 'DROP_NEXT_BATCH': {
+      const nextBatchIndex = state.currentBatchIndex + 1;
+      if (nextBatchIndex >= state.batches.length) {
+        return state;
+      }
+
+      // Add next batch to active items
+      return {
+        ...state,
+        activeItems: [...state.activeItems.filter(item => !item.collected && !item.missed), ...state.batches[nextBatchIndex]],
+        currentBatchIndex: nextBatchIndex,
       };
     }
     case 'RESET_GAME':
       return {
         ...initialState,
         items: [],
+        activeItems: [],
+        batches: [],
       };
     default:
       return state;
@@ -135,11 +157,34 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
   const { toast } = useToast();
 
+  // Generate items when game starts
   useEffect(() => {
     if (state.isGameStarted && state.items.length === 0) {
       dispatch({ type: 'GENERATE_ITEMS' });
     }
   }, [state.isGameStarted]);
+
+  // Drop next batch when current batch is processed
+  useEffect(() => {
+    if (!state.isGameStarted || state.isGameOver) return;
+    
+    // Check if current batch is all collected or missed
+    const currentBatchIsProcessed = state.activeItems.length > 0 && 
+      state.activeItems.every(item => item.collected || item.missed);
+    
+    // Check if we need to drop the next batch
+    const shouldDropNextBatch = 
+      (currentBatchIsProcessed || state.activeItems.length === 0) && 
+      state.currentBatchIndex < state.batches.length - 1;
+    
+    if (shouldDropNextBatch) {
+      const timer = setTimeout(() => {
+        dispatch({ type: 'DROP_NEXT_BATCH' });
+      }, 1000); // Wait 1 second before dropping next batch
+      
+      return () => clearTimeout(timer);
+    }
+  }, [state.isGameStarted, state.isGameOver, state.activeItems, state.currentBatchIndex, state.batches.length]);
 
   useEffect(() => {
     if (state.isGameOver) {

@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 const GameScreen: React.FC = () => {
   const { state, startGame, resetGame } = useGame();
   const { 
-    items, 
+    activeItems, 
     score, 
     goodItemsCollected, 
     totalItems, 
@@ -20,14 +20,14 @@ const GameScreen: React.FC = () => {
 
   // Force reflow on game reset to restart animations
   useEffect(() => {
-    if (!isGameStarted && items.length === 0) {
+    if (!isGameStarted && activeItems.length === 0) {
       const gameContainer = document.getElementById('game-container');
       if (gameContainer) {
         // Force reflow
         void gameContainer.offsetWidth;
       }
     }
-  }, [isGameStarted, items.length]);
+  }, [isGameStarted, activeItems.length]);
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-game-bg-start to-game-bg-end">
@@ -57,7 +57,7 @@ const GameScreen: React.FC = () => {
         id="game-container"
         className="relative w-full h-full"
       >
-        {isGameStarted && !isGameOver && items.map((item) => (
+        {isGameStarted && !isGameOver && activeItems.map((item) => (
           <FallingItem key={item.id} item={item} />
         ))}
       </div>
