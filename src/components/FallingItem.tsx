@@ -56,9 +56,6 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
 
   if (item.collected || item.missed) return null;
 
-  // Use FALL_SPEED from constants instead of the item's speed
-  const fallDuration = FALL_SPEED;
-
   return (
     <div
       ref={itemRef}
@@ -71,7 +68,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       style={{
         left: isSelected ? 'calc(50% - 32px)' : `${item.x}%`,
         top: isSelected ? 'calc(50% - 32px)' : undefined,
-        '--fall-duration': `${fallDuration}s`,
+        '--fall-duration': `${FALL_SPEED}s`,
       } as React.CSSProperties}
       onClick={handleClick}
     >
