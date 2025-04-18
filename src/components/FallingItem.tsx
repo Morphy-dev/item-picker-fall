@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Item } from '@/types/game';
 import { useGame } from '@/contexts/game/GameContext';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 
 interface FallingItemProps {
   item: Item;
@@ -10,11 +11,14 @@ interface FallingItemProps {
 
 const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
   const { collectItem, missItem } = useGame();
+  const { playSound } = useSoundEffects();
   const itemRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
     if (!item.collected && !item.missed) {
+      playSound('select');
       collectItem(item.id);
+      playSound(item.type === 'good' ? 'correct' : 'wrong');
     }
   };
 
