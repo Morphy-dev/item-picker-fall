@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Item } from '@/types/game';
 import { useGame } from '@/contexts/game/GameContext';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { FALL_SPEED } from '@/contexts/game/constants';
 
 interface FallingItemProps {
   item: Item;
@@ -55,6 +56,9 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
 
   if (item.collected || item.missed) return null;
 
+  // Use FALL_SPEED from constants instead of the item's speed
+  const fallDuration = FALL_SPEED;
+
   return (
     <div
       ref={itemRef}
@@ -67,7 +71,7 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       style={{
         left: isSelected ? 'calc(50% - 32px)' : `${item.x}%`,
         top: isSelected ? 'calc(50% - 32px)' : undefined,
-        '--fall-duration': `${item.speed}s`,
+        '--fall-duration': `${fallDuration}s`,
       } as React.CSSProperties}
       onClick={handleClick}
     >
