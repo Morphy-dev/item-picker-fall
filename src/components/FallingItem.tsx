@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Item } from '@/types/game';
@@ -41,11 +42,13 @@ const FallingItem: React.FC<FallingItemProps> = ({ item }) => {
       className={cn(
         "absolute text-6xl cursor-pointer transform transition-transform",
         "animate-fall hover:scale-125",
+        "motion-reduce:transition-none motion-reduce:hover:transform-none", // Add smooth motion
         item.collected && "animate-spin-fade"
       )}
       style={{
         left: `${item.x}%`,
         '--fall-duration': `${item.speed}s`,
+        transition: 'transform 0.2s ease-in-out', // Smooth hover effect
       } as React.CSSProperties}
       onClick={handleClick}
     >

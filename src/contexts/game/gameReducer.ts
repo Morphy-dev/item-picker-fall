@@ -1,4 +1,3 @@
-
 import { GameState, Item } from '@/types/game';
 import { GameAction } from './gameActions';
 import { goodIcons, badIcons } from './gameActions';
@@ -16,6 +15,8 @@ export const initialState: GameState = {
   isGameOver: false,
   isGameStarted: false,
 };
+
+const FALL_SPEED = 8; // Constant fall speed in seconds
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -65,12 +66,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'GENERATE_ITEMS': {
-      // Create array of good and bad items
       const goodItems = Array.from({ length: state.goodItems }, (_, i) => ({
         id: `good-${i}`,
         type: 'good' as const,
         x: Math.random() * 80 + 10,
-        speed: Math.random() * 2 + 5,
+        speed: FALL_SPEED, // Use constant speed instead of random
         collected: false,
         missed: false,
         icon: goodIcons[i % goodIcons.length],
@@ -80,7 +80,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         id: `bad-${i}`,
         type: 'bad' as const,
         x: Math.random() * 80 + 10,
-        speed: Math.random() * 2 + 5,
+        speed: FALL_SPEED, // Use constant speed instead of random
         collected: false,
         missed: false,
         icon: badIcons[i % badIcons.length],
