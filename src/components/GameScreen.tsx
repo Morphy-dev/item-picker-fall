@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useGame } from '@/contexts/game/GameContext';
 import FallingItem from './FallingItem';
@@ -6,28 +7,34 @@ import { usePlayInstructions } from '@/hooks/usePlayInstructions';
 import { usePreloadResources } from '@/hooks/usePreloadResources';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import ResultsModal from './ResultsModal';
+
 declare global {
   interface Window {
     studentId?: string;
     studentSession?: string;
   }
 }
+
 const GameScreen: React.FC = () => {
   const {
     state,
     startGame,
     resetGame
   } = useGame();
+  
   const {
     activeItems,
     isGameOver,
     isGameStarted,
     goodItemsCollected
   } = state;
+  
   const {
     isLoading
   } = usePreloadResources();
+  
   usePlayInstructions(isGameStarted, state.items.length > 0);
+  
   useEffect(() => {
     if (!isGameStarted && activeItems.length === 0) {
       const gameContainer = document.getElementById('game-container');
@@ -36,6 +43,7 @@ const GameScreen: React.FC = () => {
       }
     }
   }, [isGameStarted, activeItems.length]);
+  
   const handleNext = () => {
     window.parent.postMessage({
       type: "game_finished",
@@ -46,16 +54,23 @@ const GameScreen: React.FC = () => {
     }, "*");
     resetGame();
   };
+  
   if (isLoading) {
     return <div className="relative w-full h-screen overflow-hidden bg-neutral-900 flex items-center justify-center">
         <div className="text-white text-2xl animate-pulse">Loading resources...</div>
       </div>;
   }
-  return <div className="relative w-full h-screen overflow-hidden flex items-center justify-center">
-      <div className="relative w-full h-full max-w-[1152px] flex items-center justify-center">
-        <AspectRatio ratio={16 / 9} style={{
-        backgroundImage: `url("https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/public/other/Semana01_Escena-06-v3.png")`
-      }} className="w-full mx-auto bg-cover bg-center bg-no-repeat absolute inset-0 py-0 px-0" />
+  
+  return (
+    <div className="relative w-full h-screen overflow-hidden flex items-center justify-center">
+      <div className="relative w-full h-full max-w-[1152px] mx-auto flex items-center justify-center">
+        <AspectRatio 
+          ratio={16 / 9} 
+          className="w-full h-full bg-cover bg-center bg-no-repeat absolute inset-0"
+          style={{
+            backgroundImage: `url("https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/public/other/Semana01_Escena-06-v3.png")`
+          }}
+        />
         
         <div id="game-container" className="relative w-full h-full">
           {isGameStarted && !isGameOver && activeItems.map(item => <FallingItem key={item.id} item={item} />)}
@@ -71,6 +86,8 @@ const GameScreen: React.FC = () => {
 
         <ResultsModal open={isGameOver} goodItemsCollected={goodItemsCollected} maxAttempts={10} onNext={handleNext} />
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default GameScreen;
