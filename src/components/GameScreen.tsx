@@ -63,28 +63,29 @@ const GameScreen: React.FC = () => {
   
   return (
     <div className="relative w-full h-screen overflow-hidden flex items-center justify-center">
-      <div className="relative w-full h-full max-w-[1152px] mx-auto flex items-center justify-center">
-        <AspectRatio 
-          ratio={16 / 9} 
-          className="w-full h-full bg-cover bg-center bg-no-repeat absolute inset-0"
-          style={{
-            backgroundImage: `url("https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/public/other/Semana01_Escena-06-v3.png")`
-          }}
-        />
-        
-        <div id="game-container" className="relative w-full h-full">
-          {isGameStarted && !isGameOver && activeItems.map(item => <FallingItem key={item.id} item={item} />)}
-        </div>
-
-        {(!isGameStarted || isGameOver) && <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="animate-scale-up text-center p-6 bg-white/10 rounded-xl max-w-md backdrop-blur-md">
-              <Button onClick={isGameOver ? resetGame : startGame} className="bg-white/20 hover:bg-white/30 text-white px-8 py-4 text-lg rounded-full">
-                {isGameOver ? 'Play Again' : 'Start Game'}
-              </Button>
+      <div className="relative w-full max-w-[1152px] h-0 pb-[56.25%] mx-auto">
+        <div className="absolute inset-0">
+          <div 
+            className="w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url("https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/public/other/Semana01_Escena-06-v3.png")`
+            }}
+          >
+            <div id="game-container" className="relative w-full h-full">
+              {isGameStarted && !isGameOver && activeItems.map(item => <FallingItem key={item.id} item={item} />)}
             </div>
-          </div>}
 
-        <ResultsModal open={isGameOver} goodItemsCollected={goodItemsCollected} maxAttempts={10} onNext={handleNext} />
+            {(!isGameStarted || isGameOver) && <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+                <div className="animate-scale-up text-center p-6 bg-white/10 rounded-xl max-w-md backdrop-blur-md">
+                  <Button onClick={isGameOver ? resetGame : startGame} className="bg-white/20 hover:bg-white/30 text-white px-8 py-4 text-lg rounded-full">
+                    {isGameOver ? 'Play Again' : 'Start Game'}
+                  </Button>
+                </div>
+              </div>}
+
+            <ResultsModal open={isGameOver} goodItemsCollected={goodItemsCollected} maxAttempts={10} onNext={handleNext} />
+          </div>
+        </div>
       </div>
     </div>
   );
