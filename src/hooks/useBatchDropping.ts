@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import { GameState } from '@/types/game';
 import { GameAction } from '@/contexts/game/gameActions';
@@ -14,16 +15,18 @@ export function useBatchDropping(state: GameState, dispatch: React.Dispatch<Game
       return;
     }
 
-    // Drop a single item every 3 seconds
+    // Drop two items every 3 seconds (doubled from single item)
     singleDropTimerRef.current = setInterval(() => {
       if (state.currentBatchIndex < state.batches.length - 1) {
-        dispatch({ type: 'DROP_NEXT_ITEM' });
+        dispatch({ type: 'DROP_TWO_ITEMS' });
       }
     }, 3000);
 
-    // Drop two items every 6 seconds
+    // Drop four items every 6 seconds (doubled from two items)
     doubleDropTimerRef.current = setInterval(() => {
-      if (state.currentBatchIndex < state.batches.length - 1) {
+      if (state.currentBatchIndex < state.batches.length - 2) {
+        // Drop twice to get 4 items
+        dispatch({ type: 'DROP_TWO_ITEMS' });
         dispatch({ type: 'DROP_TWO_ITEMS' });
       }
     }, 6000);
