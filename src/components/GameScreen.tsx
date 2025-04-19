@@ -57,10 +57,10 @@ const GameScreen: React.FC = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden flex items-center justify-center">
-      <div className="relative w-full h-full max-h-[calc(100vw*9/16)] flex items-center justify-center">
+      <div className="relative w-full h-full max-w-[1152px] flex items-center justify-center">
         <AspectRatio 
           ratio={16/9} 
-          className="w-full max-w-[1152px] mx-auto bg-cover bg-center bg-no-repeat absolute"
+          className="w-full mx-auto bg-cover bg-center bg-no-repeat absolute inset-0"
           style={{ 
             backgroundImage: `url("https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/public/other/Semana01_Escena-06-v3.png")`
           }}
