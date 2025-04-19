@@ -518,6 +518,41 @@ export type Database = {
           },
         ]
       }
+      student_progress: {
+        Row: {
+          activity: string
+          completed_at: string | null
+          id: string
+          session_id: string | null
+          started_at: string
+          student_id: string
+        }
+        Insert: {
+          activity: string
+          completed_at?: string | null
+          id?: string
+          session_id?: string | null
+          started_at?: string
+          student_id: string
+        }
+        Update: {
+          activity?: string
+          completed_at?: string | null
+          id?: string
+          session_id?: string | null
+          started_at?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_progress_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "estudiantes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       videos: {
         Row: {
           created_at: string | null
@@ -590,6 +625,8 @@ export type Database = {
           id: string
           is_correct: boolean
           session_id: string
+          student_id: string | null
+          student_session: string | null
         }
         Insert: {
           attempt_number: number
@@ -597,6 +634,8 @@ export type Database = {
           id?: string
           is_correct: boolean
           session_id: string
+          student_id?: string | null
+          student_session?: string | null
         }
         Update: {
           attempt_number?: number
@@ -604,6 +643,8 @@ export type Database = {
           id?: string
           is_correct?: boolean
           session_id?: string
+          student_id?: string | null
+          student_session?: string | null
         }
         Relationships: []
       }

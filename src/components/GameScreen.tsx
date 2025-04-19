@@ -5,6 +5,15 @@ import FallingItem from './FallingItem';
 import { Button } from '@/components/ui/button';
 import { usePlayInstructions } from '@/hooks/usePlayInstructions';
 import { usePreloadResources } from '@/hooks/usePreloadResources';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import ResultsModal from './ResultsModal';
+
+declare global {
+  interface Window {
+    studentId?: string;
+    studentSession?: string;
+  }
+}
 
 const GameScreen: React.FC = () => {
   const { state, startGame, resetGame } = useGame();
@@ -12,6 +21,7 @@ const GameScreen: React.FC = () => {
     activeItems, 
     isGameOver,
     isGameStarted,
+    goodItemsCollected,
   } = state;
   const { isLoading } = usePreloadResources();
 
@@ -26,6 +36,17 @@ const GameScreen: React.FC = () => {
     }
   }, [isGameStarted, activeItems.length]);
 
+  const handleNext = () => {
+    window.parent.postMessage({ 
+      type: "game_finished",
+      data: {
+        studentId: window.studentId,
+        studentSession: window.studentSession
+      }
+    }, "*");
+    resetGame();
+  };
+
   if (isLoading) {
     return (
       <div className="relative w-full h-screen overflow-hidden bg-neutral-900 flex items-center justify-center">
@@ -35,7 +56,15 @@ const GameScreen: React.FC = () => {
   }
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-neutral-900">
+    <div className="relative w-full h-screen overflow-hidden">
+      <AspectRatio 
+        ratio={16/9} 
+        className="w-full max-w-[1152px] mx-auto bg-cover bg-center bg-no-repeat absolute inset-0"
+        style={{ 
+          backgroundImage: `url("https://ksnyoasamhyunakuqdst.supabase.co/storage/v1/object/public/other/Semana01_Escena-06-v3.png")`
+        }}
+      />
+      
       <div 
         id="game-container"
         className="relative w-full h-full"
@@ -57,6 +86,13 @@ const GameScreen: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ResultsModal 
+        open={isGameOver}
+        goodItemsCollected={goodItemsCollected}
+        maxAttempts={10}
+        onNext={handleNext}
+      />
     </div>
   );
 };
